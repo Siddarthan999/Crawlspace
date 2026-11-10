@@ -1,0 +1,53 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: seo
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-seo}
+      POSTGRES_DB: seocrawler
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U seo -d seocrawler"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5433}:5432"   # host:container — exposed only so you can inspect the DB with a client if you want
+
+  backend:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+psycopg://seo:${POSTGRES_PASSWORD:-seo}@postgres:5432/seocrawler
+      DATA_DIR: /data
+      MAX_PARALLEL_CRAWLS: ${MAX_PARALLEL_CRAWLS:-2}
+      PAGESPEED_API_KEY: ${PAGESPEED_API_KEY:-}
+      GSC_CLIENT_ID: ${GSC_CLIENT_ID:-}
+      GSC_CLIENT_SECRET: ${GSC_CLIENT_SECRET:-}
+      GSC_REDIRECT_URI: ${GSC_REDIRECT_URI:-http://localhost:8080/api/gsc/callback}
+      BING_WEBMASTER_API_KEY: ${BING_WEBMASTER_API_KEY:-}
+      OPENPAGERANK_API_KEY: ${OPENPAGERANK_API_KEY:-}
+    volumes:
+      - ./backend:/app
+      - crawl_data:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${BACKEND_PORT:-8000}:8000"   # exposed directly too, handy for API docs at /docs during development
+
+  frontend:
+    build:
+      context: ./frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${FRONTEND_PORT:-8080}:80"
+
+volumes:
+  pgdata:
+  crawl_data:

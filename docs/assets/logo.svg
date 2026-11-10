@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <title>Crawlspace</title>
+  <rect width="32" height="32" rx="8" fill="#7E69E8"/>
+  <g fill="none" stroke="#0D0A1F" stroke-width="2" stroke-linecap="round">
+    <path d="M11.6 16H21"/>
+    <path d="M11.6 16C16 16 16.4 8.5 21 8.5"/>
+    <path d="M11.6 16C16 16 16.4 23.5 21 23.5"/>
+    <circle cx="9" cy="16" r="2.6"/>
+    <circle cx="23" cy="23.5" r="1.9" stroke-width="1.6"/>
+  </g>
+  <g fill="#0D0A1F"><circle cx="23" cy="8.5" r="1.9"/><circle cx="23" cy="16" r="1.9"/></g>
+</svg>
